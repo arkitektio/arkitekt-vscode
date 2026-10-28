@@ -1,0 +1,139 @@
+{
+  "name": "bsx-vscode",
+  "displayName": "BSX for Arkitekt",
+  "description": "Blok BSX in VS Code: your app's own `arkitekt check` underlined in the BSX of every blok (through arkitekt-lsp), plus highlighting, completion and hovers from the Orkestrator's language core.",
+  "version": "0.1.0",
+  "publisher": "arkitekt",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "arkitekt-lsp imports your app to check it, so it starts only in a trusted workspace. Highlighting, and completion in .bsx files, work everywhere.",
+      "restrictedConfigurations": [
+        "arkitekt.lsp.path"
+      ]
+    }
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "bsx",
+        "aliases": [
+          "BSX",
+          "bsx"
+        ],
+        "extensions": [
+          ".bsx"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "bsx",
+        "scopeName": "source.bsx",
+        "path": "./syntaxes/bsx.tmLanguage.json"
+      },
+      {
+        "scopeName": "bsx.injection.python.multi",
+        "path": "./syntaxes/bsx-in-python-multi.tmLanguage.json",
+        "injectTo": [
+          "source.python"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.bsx": "bsx"
+        }
+      },
+      {
+        "scopeName": "bsx.injection.python.single",
+        "path": "./syntaxes/bsx-in-python-single.tmLanguage.json",
+        "injectTo": [
+          "source.python"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.line.bsx": "bsx"
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "arkitekt.check",
+        "title": "Check App",
+        "category": "Arkitekt"
+      },
+      {
+        "command": "arkitekt.restart",
+        "title": "Restart Language Server",
+        "category": "Arkitekt"
+      },
+      {
+        "command": "arkitekt.showOutput",
+        "title": "Show Language Server Output",
+        "category": "Arkitekt"
+      }
+    ],
+    "configuration": {
+      "title": "Arkitekt",
+      "properties": {
+        "arkitekt.check.onSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run `arkitekt check` (through arkitekt-lsp) when a Python file of an app is saved."
+        },
+        "arkitekt.check.timeout": {
+          "type": "number",
+          "default": 120,
+          "minimum": 5,
+          "description": "Seconds a check may take before it is stopped. Importing an app imports its libraries, which can be slow."
+        },
+        "arkitekt.target": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "The app to check when the saved file is not itself one, as `arkitekt check` takes it (`app`, `pkg.main:api`, `app.py`). Empty: the CLI's default (ARKITEKT_APP, else `app`)."
+        },
+        "arkitekt.lsp.path": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "description": "The `arkitekt-lsp` executable. Empty: the workspace's .venv, then the Python extension's interpreter, then PATH. It must run in the app's environment: it imports the app to check it."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "grammars": "node syntaxes/generate.mjs",
+    "build": "node syntaxes/generate.mjs && node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit -p .",
+    "package": "pnpm build && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.1",
+    "@types/vscode": "1.100.0",
+    "esbuild": "0.27.7",
+    "typescript": "5.9.3",
+    "@arkitektio/bsx": "workspace:*",
+    "@vscode/vsce": "^3.6.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arkitektio/bsx.git",
+    "directory": "packages/vscode"
+  }
+}

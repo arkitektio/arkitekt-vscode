@@ -1,0 +1,174 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "BSX",
+  "scopeName": "source.bsx",
+  "comment": "The Orkestrator's Monarch tokenizer (core/blok/editor/BsxEditor.tsx) as TextMate: tags and attributes as in XML; `{...}` (an attribute's value, or among a component's children) is an expression, coloured as code. Braces nest (object literals, clsx objects).",
+  "patterns": [
+    {
+      "include": "#markup"
+    }
+  ],
+  "repository": {
+    "markup": {
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#close-tag"
+        },
+        {
+          "include": "#tag"
+        },
+        {
+          "include": "#expression"
+        }
+      ]
+    },
+    "comment": {
+      "name": "comment.block.bsx",
+      "begin": "<!--",
+      "end": "-->",
+      "captures": {
+        "0": {
+          "name": "punctuation.definition.comment.bsx"
+        }
+      }
+    },
+    "close-tag": {
+      "match": "(</)([A-Za-z_][\\w:.\\-]*)\\s*(>)",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.bsx"
+        },
+        "2": {
+          "name": "entity.name.tag.bsx"
+        },
+        "3": {
+          "name": "punctuation.definition.tag.end.bsx"
+        }
+      }
+    },
+    "tag": {
+      "begin": "(<)([A-Za-z_][\\w:.\\-]*)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.bsx"
+        },
+        "2": {
+          "name": "entity.name.tag.bsx"
+        }
+      },
+      "end": "(/?>)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.end.bsx"
+        }
+      },
+      "name": "meta.tag.bsx",
+      "patterns": [
+        {
+          "match": "[A-Za-z_][\\w:.\\-]*",
+          "name": "entity.other.attribute-name.bsx"
+        },
+        {
+          "match": "=",
+          "name": "punctuation.separator.key-value.bsx"
+        },
+        {
+          "match": "\"[^\"]*\"",
+          "name": "string.quoted.double.bsx"
+        },
+        {
+          "match": "'[^']*'",
+          "name": "string.quoted.single.bsx"
+        },
+        {
+          "include": "#expression"
+        }
+      ]
+    },
+    "expression": {
+      "name": "meta.embedded.expression.bsx",
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.embedded.begin.bsx"
+        }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.embedded.end.bsx"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#expression-body"
+        }
+      ]
+    },
+    "braces": {
+      "begin": "\\{",
+      "end": "\\}",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.braces.begin.bsx"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.braces.end.bsx"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#expression-body"
+        }
+      ]
+    },
+    "expression-body": {
+      "patterns": [
+        {
+          "include": "#braces"
+        },
+        {
+          "match": "\"([^\"\\\\]|\\\\.)*\"",
+          "name": "string.quoted.double.bsx"
+        },
+        {
+          "match": "'([^'\\\\]|\\\\.)*'",
+          "name": "string.quoted.single.bsx"
+        },
+        {
+          "match": "\\b(true|false|null)\\b",
+          "name": "constant.language.bsx"
+        },
+        {
+          "match": "\\binto\\b",
+          "name": "keyword.control.bsx"
+        },
+        {
+          "match": "\\b(self|deps|queries|subscriptions|args|task|event|viewer|then|error)\\b",
+          "name": "variable.language.bsx"
+        },
+        {
+          "match": "-?\\d+(\\.\\d+)?([eE][+-]?\\d+)?",
+          "name": "constant.numeric.bsx"
+        },
+        {
+          "match": "[A-Za-z_]\\w*(?=\\s*\\()",
+          "name": "entity.name.function.bsx"
+        },
+        {
+          "match": "[A-Za-z_]\\w*",
+          "name": "variable.other.bsx"
+        },
+        {
+          "match": "[^{}\"'A-Za-z_0-9\\s]+",
+          "name": "keyword.operator.bsx"
+        }
+      ]
+    }
+  }
+}
