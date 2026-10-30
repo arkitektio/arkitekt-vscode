@@ -43,7 +43,11 @@ export const findServer = async (folder: vscode.WorkspaceFolder | undefined): Pr
 export const serverSettings = (folder: vscode.WorkspaceFolder | undefined): Record<string, unknown> => {
   const config = vscode.workspace.getConfiguration('arkitekt', folder);
   return {
-    check: {onSave: config.get<boolean>('check.onSave', true), timeout: config.get<number>('check.timeout', 120)},
+    check: {
+      onSave: config.get<boolean>('check.onSave', true),
+      timeout: config.get<number>('check.timeout', 120),
+      warnOnFStrings: config.get<boolean>('check.warnOnFStrings', true),
+    },
     target: config.get<string>('target', '') || null,
     clientShowsLogin: true,
     clientPicksDependencies: true,

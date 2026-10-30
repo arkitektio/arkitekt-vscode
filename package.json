@@ -128,6 +128,11 @@
           "minimum": 5,
           "description": "Seconds a check may take before it is stopped. Importing an app imports its libraries, which can be slow."
         },
+        "arkitekt.check.warnOnFStrings": {
+          "type": "boolean",
+          "default": true,
+          "description": "Warn at a blok written as an f-string: Python fills it in once, when the app starts, and it is static after that. `<foreach>` and `<if>` follow the app as it runs."
+        },
         "arkitekt.target": {
           "type": "string",
           "default": "",
