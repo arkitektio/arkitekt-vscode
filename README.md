@@ -18,7 +18,9 @@ Bloks in VS Code. It has two layers:
   the status bar, or run `Arkitekt: Log In`. Your browser opens to approve a read-only login at
   `arkitekt.server.url` (`https://go.arkitekt.live` by default), and this holds until
   `Arkitekt: Log Out`, which also revokes it. Each dependency protocol then gets a count of agents
-  above it, a warning when nobody offers it, and the agents on hover.
+  above it, a warning when nobody offers it, and the agents on hover. `Arkitekt: Add a Dependency from
+  the Server…` (or the lens above your `App(...)`) lets you search the agents, tick the actions and
+  states you need, and writes the `@app.declare` class for you.
 
 ## Develop
 

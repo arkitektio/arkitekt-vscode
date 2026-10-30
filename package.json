@@ -83,6 +83,11 @@
         "category": "Arkitekt"
       },
       {
+        "command": "arkitekt.addDependency",
+        "title": "Add a Dependency from the Server\u2026",
+        "category": "Arkitekt"
+      },
+      {
         "command": "arkitekt.login",
         "title": "Log In",
         "category": "Arkitekt"

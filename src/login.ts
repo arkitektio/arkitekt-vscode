@@ -46,6 +46,10 @@ export class RekuestLogin {
     private readonly folder: () => vscode.WorkspaceFolder | undefined,
   ) {}
 
+  get connected(): boolean {
+    return this.status.state === 'connected';
+  }
+
   private get url(): string {
     return vscode.workspace.getConfiguration('arkitekt', this.folder()).get<string>('server.url', '') || 'https://go.arkitekt.live';
   }
@@ -162,6 +166,7 @@ export class RekuestLogin {
     const choices: Choice[] = [];
     if (state === 'connected') {
       choices.push(
+        {label: '$(add) Add a Dependency…', description: 'browse the agents', run: () => vscode.commands.executeCommand('arkitekt.addDependency')},
         {label: '$(refresh) Ask Again', description: 'who satisfies each dependency', run: () => this.server.notify('arkitekt/rekuest/refresh', {})},
         {label: '$(sign-out) Log Out', description: host, run: () => this.logOut()},
         {label: '$(server) Log In to Another Server…', run: () => this.otherServer()},

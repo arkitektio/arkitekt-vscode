@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import {LanguageClient, State, type LanguageClientOptions, type ServerOptions} from 'vscode-languageclient/node';
 import {registerBsx, type Region} from './bsx';
+import {addDependency} from './dependency';
 import {RekuestLogin, type Challenge, type RekuestStatus} from './login';
 import {findServer, serverSettings} from './server';
 
@@ -117,6 +118,13 @@ export const activate = async (context: vscode.ExtensionContext): Promise<void> 
       if (client?.state === State.Running) await client.sendNotification('arkitekt/rekuest/refresh', {});
     }),
     vscode.commands.registerCommand('arkitekt.rekuest.menu', () => login.menu()),
+    vscode.commands.registerCommand('arkitekt.addDependency', () =>
+      addDependency(
+        {request: async <T>(method: string, params: object) => client?.sendRequest<T>(method, params) as Promise<T>},
+        () => login.connected,
+        () => login.logIn(),
+      ),
+    ),
     vscode.commands.registerCommand('arkitekt.login', () => login.logIn()),
     vscode.commands.registerCommand('arkitekt.logout', () => login.logOut()),
     vscode.commands.registerCommand('arkitekt.showOutput', () => output.show()),
