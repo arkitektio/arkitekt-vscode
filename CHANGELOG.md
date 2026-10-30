@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.1.2...v1.2.0) (2026-10-30)
+
+
+### Features
+
+* choose the app from the status bar ([99c58b7](https://github.com/arkitektio/arkitekt-vscode/commit/99c58b7c1af8226a28a28ab13740b3907bd28b17))
+
 ## [1.1.2](https://github.com/arkitektio/arkitekt-vscode/compare/v1.1.1...v1.1.2) (2026-10-30)
 
 
