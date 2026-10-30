@@ -2,7 +2,7 @@
   "name": "bsx-vscode",
   "displayName": "BSX for Arkitekt",
   "description": "Blok BSX in VS Code: your app's own `arkitekt check` underlined in the BSX of every blok (through arkitekt-lsp), plus highlighting, completion and hovers from the Orkestrator's language core.",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "publisher": "arkitekt",
   "private": true,
   "license": "MIT",
