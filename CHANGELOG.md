@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.2.0...v1.3.0) (2026-10-30)
+
+
+### Features
+
+* a setting for the warning at f-string bloks ([28a318d](https://github.com/arkitektio/arkitekt-vscode/commit/28a318d0b0cd90cd89ea79de07e0e9b4c44d3cc8))
+
 # [1.2.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.1.2...v1.2.0) (2026-10-30)
 
 
