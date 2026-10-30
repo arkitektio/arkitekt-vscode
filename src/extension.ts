@@ -10,6 +10,8 @@ type WireRegion = Omit<Region, 'start' | 'end'> & {
 
 type Status = {state: 'checking' | 'ok' | 'failed'; app: string; errors?: number; warnings?: number; message?: string | null};
 
+type RekuestStatus = {state: 'connecting' | 'login' | 'connected' | 'offline' | 'off'; url: string; message?: string | null};
+
 let client: LanguageClient | undefined;
 
 const regionCache = new Map<string, {version: number; regions: readonly Region[]}>();
@@ -43,7 +45,18 @@ const showStatus = (item: vscode.StatusBarItem, status: Status) => {
   item.show();
 };
 
-const start = async (context: vscode.ExtensionContext, output: vscode.OutputChannel, item: vscode.StatusBarItem) => {
+const showRekuest = (item: vscode.StatusBarItem, status: RekuestStatus) => {
+  if (status.state === 'off') {
+    item.hide();
+    return;
+  }
+  const icon = {connecting: '$(sync~spin)', login: '$(key)', connected: '$(plug)', offline: '$(debug-disconnect)'}[status.state];
+  item.text = `${icon} rekuest`;
+  item.tooltip = status.message ?? `${status.url}: ${status.state === 'connected' ? 'read-only, click to ask again' : status.state}`;
+  item.show();
+};
+
+const start = async (context: vscode.ExtensionContext, output: vscode.OutputChannel, item: vscode.StatusBarItem, rekuest: vscode.StatusBarItem) => {
   if (client) return;
   const folder = vscode.workspace.workspaceFolders?.[0];
   const command = await findServer(folder);
@@ -61,7 +74,10 @@ const start = async (context: vscode.ExtensionContext, output: vscode.OutputChan
     outputChannel: output,
   };
   client = new LanguageClient('arkitekt', 'Arkitekt', serverOptions, clientOptions);
-  context.subscriptions.push(client.onNotification('arkitekt/status', (status: Status) => showStatus(item, status)));
+  context.subscriptions.push(
+    client.onNotification('arkitekt/status', (status: Status) => showStatus(item, status)),
+    client.onNotification('arkitekt/rekuest', (status: RekuestStatus) => showRekuest(rekuest, status)),
+  );
   output.appendLine(`Starting ${command}`);
   await client.start();
 };
@@ -70,7 +86,9 @@ export const activate = async (context: vscode.ExtensionContext): Promise<void> 
   const output = vscode.window.createOutputChannel('Arkitekt');
   const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
   item.command = 'arkitekt.check';
-  context.subscriptions.push(output, item);
+  const rekuest = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 9);
+  rekuest.command = 'arkitekt.rekuest.refresh';
+  context.subscriptions.push(output, item, rekuest);
 
   registerBsx(context, regionsOf);
 
@@ -89,15 +107,18 @@ export const activate = async (context: vscode.ExtensionContext): Promise<void> 
     }),
     vscode.commands.registerCommand('arkitekt.restart', async () => {
       if (client) await client.restart();
-      else await start(context, output, item);
+      else await start(context, output, item, rekuest);
+    }),
+    vscode.commands.registerCommand('arkitekt.rekuest.refresh', async () => {
+      if (client?.state === State.Running) await client.sendNotification('arkitekt/rekuest/refresh', {});
     }),
     vscode.commands.registerCommand('arkitekt.showOutput', () => output.show()),
     vscode.workspace.onDidCloseTextDocument(document => regionCache.delete(document.uri.toString())),
   );
 
   // The server imports the app to check it: only a trusted workspace runs it.
-  if (vscode.workspace.isTrusted) await start(context, output, item);
-  else context.subscriptions.push(vscode.workspace.onDidGrantWorkspaceTrust(() => void start(context, output, item)));
+  if (vscode.workspace.isTrusted) await start(context, output, item, rekuest);
+  else context.subscriptions.push(vscode.workspace.onDidGrantWorkspaceTrust(() => void start(context, output, item, rekuest)));
 };
 
 export const deactivate = async (): Promise<void> => {

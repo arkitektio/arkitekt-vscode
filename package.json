@@ -82,6 +82,11 @@
         "command": "arkitekt.showOutput",
         "title": "Show Language Server Output",
         "category": "Arkitekt"
+      },
+      {
+        "command": "arkitekt.rekuest.refresh",
+        "title": "Ask Rekuest Again",
+        "category": "Arkitekt"
       }
     ],
     "configuration": {
@@ -103,6 +108,16 @@
           "default": "",
           "scope": "resource",
           "description": "The app to check when the saved file is not itself one, as `arkitekt check` takes it (`app`, `pkg.main:api`, `app.py`). Empty: the CLI's default (ARKITEKT_APP, else `app`)."
+        },
+        "arkitekt.server.connect": {
+          "type": "boolean",
+          "default": false,
+          "description": "Also ask rekuest, with a read-only login, who would satisfy each dependency your app declares: a count above each protocol, a warning when nobody does, the agents on hover. Off, the language server talks to nothing."
+        },
+        "arkitekt.server.url": {
+          "type": "string",
+          "default": "https://go.arkitekt.live",
+          "description": "The coordination server to connect to when `arkitekt.server.connect` is on."
         },
         "arkitekt.lsp.path": {
           "type": "string",

@@ -45,5 +45,6 @@ export const serverSettings = (folder: vscode.WorkspaceFolder | undefined): Reco
   return {
     check: {onSave: config.get<boolean>('check.onSave', true), timeout: config.get<number>('check.timeout', 120)},
     target: config.get<string>('target', '') || null,
+    server: {connect: config.get<boolean>('server.connect', false), url: config.get<string>('server.url', '')},
   };
 };

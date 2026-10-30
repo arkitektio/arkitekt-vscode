@@ -21,6 +21,10 @@ export type Region = {
   kind: string;
   /** The value is the text as written (no escapes): positions map one to one. */
   exact: boolean;
+  /** The blok a check saw here (`panel`, `crop:html`), if one has. */
+  blok?: string;
+  /** What that check said the blok declares: what `deps.*`, `args.*` and its locals complete against. */
+  scope?: BlokCheckScope;
 };
 
 /** The blok literals of a Python document; none when there is no server to ask. */
@@ -73,7 +77,7 @@ const locate = async (document: vscode.TextDocument, position: vscode.Position, 
         value: region.value,
         offset: offset - base,
         base,
-        env: {scope: emptyBlokScope(region.kind as BlokCheckScope['kind'], region.context)},
+        env: {scope: region.scope ?? emptyBlokScope(region.kind as BlokCheckScope['kind'], region.context)},
       };
     }
   }
