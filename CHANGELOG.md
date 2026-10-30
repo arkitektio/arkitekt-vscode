@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/arkitektio/arkitekt-vscode/compare/v1.1.1...v1.1.2) (2026-10-30)
+
+
+### Bug Fixes
+
+* describe the server connection without the login wording ([5f203db](https://github.com/arkitektio/arkitekt-vscode/commit/5f203dbd3065f19d945d2662284b89b4cee506f3))
+
 ## [1.1.1](https://github.com/arkitektio/arkitekt-vscode/compare/v1.1.0...v1.1.1) (2026-10-30)
 
 
