@@ -90,17 +90,17 @@
       },
       {
         "command": "arkitekt.login",
-        "title": "Log In",
+        "title": "Connect to Server",
         "category": "Arkitekt"
       },
       {
         "command": "arkitekt.logout",
-        "title": "Log Out",
+        "title": "Disconnect from Server",
         "category": "Arkitekt"
       },
       {
         "command": "arkitekt.rekuest.menu",
-        "title": "Server Login…",
+        "title": "Server…",
         "category": "Arkitekt"
       },
       {
@@ -132,12 +132,12 @@
         "arkitekt.server.connect": {
           "type": "boolean",
           "default": false,
-          "description": "Also ask rekuest, with a read-only login, who would satisfy each dependency your app declares: a count above each protocol, a warning when nobody does, the agents on hover. `Arkitekt: Log In` turns this on and `Arkitekt: Log Out` turns it off. Off, the language server talks to nothing."
+          "description": "Also ask rekuest, with read-only access, who would satisfy each dependency your app declares: a count above each protocol, a warning when nobody does, the agents on hover. `Arkitekt: Connect to Server` turns this on and `Arkitekt: Disconnect from Server` turns it off. Off, the language server talks to nothing."
         },
         "arkitekt.server.url": {
           "type": "string",
           "default": "https://go.arkitekt.live",
-          "description": "The coordination server `Arkitekt: Log In` logs in to."
+          "description": "The coordination server `Arkitekt: Connect to Server` uses."
         },
         "arkitekt.lsp.path": {
           "type": "string",

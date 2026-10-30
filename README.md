@@ -14,11 +14,11 @@ Bloks in VS Code. It has two layers:
   `<ActionLogo>`) and in `.bsx` files. Completion, hovers and signature help come from the same
   code the Orkestrator's BlokEditor runs. Inside Python they need the server to find the bloks.
 
-- **Who would satisfy your dependencies, if you log in.** Local until you ask: click **Log In** in
-  the status bar, or run `Arkitekt: Log In`. Your browser opens to approve a read-only login at
-  `arkitekt.server.url` (`https://go.arkitekt.live` by default), and this holds until
-  `Arkitekt: Log Out`, which also revokes it. Each dependency protocol then gets a count of agents
-  above it, a warning when nobody offers it, and the agents on hover. `Arkitekt: Add a Dependency from
+- **Who would satisfy your dependencies, once connected.** Local until you ask: use the button in
+  the status bar, or run `Arkitekt: Connect to Server`, with your account on the server at
+  `arkitekt.server.url`. Access is read-only and holds until `Arkitekt: Disconnect from Server`.
+  Each dependency protocol then gets a count of agents above it, a warning when nobody offers it,
+  and the agents on hover. `Arkitekt: Add a Dependency from
   the Server…` (or the lens above your `App(...)`) lets you search the agents, tick the actions and
   states you need, and writes the `@app.declare` class for you.
 
