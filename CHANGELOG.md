@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/arkitektio/arkitekt-vscode/compare/v1.1.0...v1.1.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* show the Arkitekt logo on the listing ([8aae745](https://github.com/arkitektio/arkitekt-vscode/commit/8aae745ad68603a0ffbaa390398ac56a1a1ef241))
+
 # [1.1.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.0.0...v1.1.0) (2026-10-30)
 
 
