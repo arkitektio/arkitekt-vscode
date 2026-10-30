@@ -1,0 +1,24 @@
+{
+  "branches": ["main", {"name": "next", "prerelease": "rc"}],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/changelog", {"changelogFile": "CHANGELOG.md"}],
+    [
+      "@semantic-release/exec",
+      {"prepareCmd": "node scripts/set-version.mjs ${nextRelease.version} && pnpm package"}
+    ],
+    [
+      "@semantic-release/git",
+      {"assets": ["package.json", "CHANGELOG.md"]}
+    ],
+    [
+      "@semantic-release/github",
+      {"assets": [{"path": "*.vsix", "label": "Arkitekt for VS Code (.vsix)"}]}
+    ],
+    [
+      "@semantic-release/exec",
+      {"publishCmd": "pnpm exec vsce publish --oidc --packagePath arkitekt-${nextRelease.version}.vsix"}
+    ]
+  ]
+}

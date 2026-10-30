@@ -1,4 +1,4 @@
-# BSX for Arkitekt (VS Code)
+# Arkitekt for VS Code
 
 Bloks in VS Code. It has two layers:
 
@@ -26,4 +26,11 @@ Open this folder in VS Code and run **Run the extension** (F5).
 
 `syntaxes/bsx.tmLanguage.json` is the grammar. The two `bsx-in-python-*.tmLanguage.json`
 injections are generated from it (`pnpm grammars`), with every rule also ending at the Python
-string's closing quote. The language core is `@arkitektio/bsx` (this repo's `packages/bsx`), bundled into the extension.
+string's closing quote. The language core is [`@arkitektio/bsx`](https://github.com/arkitektio/bsx), bundled into the extension.
+
+## Release
+
+semantic-release cuts every release from `main` (`next` for prereleases): the `.vsix` goes onto the
+GitHub release, then to the Marketplace as `arkitekt-dev.arkitekt`. The Marketplace trusts this
+workflow (`release.yaml`) through a Trusted Publishing policy on the publisher, and no token exists
+anywhere.

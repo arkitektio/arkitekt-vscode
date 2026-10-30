@@ -5,3 +5,10 @@ esbuild.mjs
 syntaxes/generate.mjs
 .vscode/**
 **/*.map
+scripts/**
+.github/**
+.releaserc.json
+.gitignore
+pnpm-lock.yaml
+pnpm-workspace.yaml
+CHANGELOG.md

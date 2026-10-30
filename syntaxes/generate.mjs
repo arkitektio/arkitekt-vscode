@@ -10,7 +10,7 @@ import {fileURLToPath} from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const bsx = JSON.parse(readFileSync(join(here, 'bsx.tmLanguage.json'), 'utf8'));
-const vocabulary = JSON.parse(readFileSync(join(here, '../../bsx/src/spec/vocabulary.json'), 'utf8'));
+const vocabulary = JSON.parse(readFileSync(join(here, '../node_modules/@arkitektio/bsx/src/spec/vocabulary.json'), 'utf8'));
 const roots = Object.keys(vocabulary.blok_roots.roots).join('|');
 
 const variants = [

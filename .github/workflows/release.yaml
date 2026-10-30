@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    branches: [main, next]
+  workflow_dispatch: {}
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write # Marketplace Trusted Publishing (OIDC)
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0} # semantic-release needs full history
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: 'pnpm'}
+      - run: pnpm install --frozen-lockfile
+      # A red build or typecheck publishes nothing.
+      - run: pnpm build
+      - run: pnpm typecheck
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }} # a PAT only once main is branch-protected
+          # No VSCE_PAT: the Marketplace trusts this workflow (release.yaml) as arkitekt-dev's publisher.
+        run: pnpm exec semantic-release

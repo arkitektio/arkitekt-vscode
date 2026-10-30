@@ -1,10 +1,9 @@
 {
-  "name": "bsx-vscode",
-  "displayName": "BSX for Arkitekt",
-  "description": "Blok BSX in VS Code: your app's own `arkitekt check` underlined in the BSX of every blok (through arkitekt-lsp), plus highlighting, completion and hovers from the Orkestrator's language core.",
+  "name": "arkitekt",
+  "displayName": "Arkitekt",
+  "description": "Arkitekt in VS Code: your app's own `arkitekt check` underlined in the BSX of every blok (through arkitekt-lsp), plus highlighting, completion and hovers for BSX.",
   "version": "2.2.0",
-  "publisher": "arkitekt",
-  "private": true,
+  "publisher": "arkitekt-dev",
   "license": "MIT",
   "engines": {
     "vscode": "^1.100.0"
@@ -136,19 +135,27 @@
     "package": "pnpm build && vsce package --no-dependencies"
   },
   "devDependencies": {
+    "@arkitektio/bsx": "^2.2.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
     "@types/node": "22.19.1",
     "@types/vscode": "1.100.0",
+    "@vscode/vsce": "^4.1.0",
     "esbuild": "0.27.7",
-    "typescript": "5.9.3",
-    "@arkitektio/bsx": "workspace:*",
-    "@vscode/vsce": "^3.6.0"
+    "semantic-release": "^25.0.9",
+    "typescript": "5.9.3"
   },
   "dependencies": {
     "vscode-languageclient": "9.0.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arkitektio/bsx.git",
-    "directory": "packages/vscode"
-  }
+    "url": "git+https://github.com/arkitektio/arkitekt-vscode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/arkitektio/arkitekt-vscode/issues"
+  },
+  "homepage": "https://github.com/arkitektio/arkitekt-vscode#readme",
+  "packageManager": "pnpm@12.11.2"
 }

@@ -1,0 +1,10 @@
+# pnpm blocks dependency lifecycle scripts unless they are listed here.
+#   esbuild           - postinstall resolves the platform binary
+#   @vscode/vsce-sign - marketplace signing, which neither packaging nor `vsce publish --oidc` needs
+#   keytar            - vsce's credential store, only for `vsce publish` with a stored token
+allowBuilds:
+  esbuild: true
+  '@vscode/vsce-sign': false
+  keytar: false
+minimumReleaseAgeExclude:
+  - '@arkitektio/bsx@2.2.0'

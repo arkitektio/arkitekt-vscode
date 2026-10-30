@@ -1,6 +1,5 @@
-// Bundles the extension and the Orkestrator's BSX core (core/blok/{bsx,spec}, by relative
-// import) into one CommonJS file: the extension host loads `dist/extension.js`, and `vscode`
-// is the host's own.
+// Bundles the extension and @arkitektio/bsx into one CommonJS file: the extension host loads
+// `dist/extension.js`, and `vscode` is the host's own.
 import * as esbuild from 'esbuild';
 
 const watch = process.argv.includes('--watch');
