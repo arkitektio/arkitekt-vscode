@@ -89,6 +89,11 @@
         "category": "Arkitekt"
       },
       {
+        "command": "arkitekt.chooseApp",
+        "title": "Choose App…",
+        "category": "Arkitekt"
+      },
+      {
         "command": "arkitekt.login",
         "title": "Connect to Server",
         "category": "Arkitekt"
@@ -127,7 +132,7 @@
           "type": "string",
           "default": "",
           "scope": "resource",
-          "description": "The app to check when the saved file is not itself one, as `arkitekt check` takes it (`app`, `pkg.main:api`, `app.py`). Empty: the CLI's default (ARKITEKT_APP, else `app`)."
+          "description": "The app to check when the saved file is not itself one, as `arkitekt check` takes it (`app`, `pkg.main:api`, `app.py`), and which App to use in a file with several (`many.py:api`). `Arkitekt: Choose App…` sets it. Empty: the CLI's default (ARKITEKT_APP, else `app`)."
         },
         "arkitekt.server.connect": {
           "type": "boolean",

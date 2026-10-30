@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {LanguageClient, State, type LanguageClientOptions, type ServerOptions} from 'vscode-languageclient/node';
 import {registerBsx, type Region} from './bsx';
 import {addDependency} from './dependency';
+import {chooseApp} from './apps';
 import {RekuestLogin, type Challenge, type RekuestStatus} from './login';
 import {findServer, serverSettings} from './server';
 
@@ -41,7 +42,7 @@ const showStatus = (item: vscode.StatusBarItem, status: Status) => {
   if (status.state === 'checking') item.text = `$(sync~spin) ${status.app}`;
   else if (status.state === 'ok') item.text = `$(check) ${status.app}${counts ? ` ${counts}` : ''}`;
   else item.text = `$(error) ${status.app}${counts ? ` ${counts}` : ''}`;
-  item.tooltip = status.message ?? (status.state === 'checking' ? 'arkitekt check is running' : 'arkitekt check: click to check again');
+  item.tooltip = status.message ?? (status.state === 'checking' ? 'arkitekt check is running' : 'arkitekt check: click to check again, or to choose the app');
   item.show();
 };
 
@@ -76,7 +77,7 @@ const start = async (context: vscode.ExtensionContext, output: vscode.OutputChan
 export const activate = async (context: vscode.ExtensionContext): Promise<void> => {
   const output = vscode.window.createOutputChannel('Arkitekt');
   const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
-  item.command = 'arkitekt.check';
+  item.command = 'arkitekt.chooseApp';
   const rekuest = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 9);
   rekuest.command = 'arkitekt.rekuest.menu';
   const running = () => client?.state === State.Running;
@@ -107,6 +108,13 @@ export const activate = async (context: vscode.ExtensionContext): Promise<void> 
         return;
       }
       await client.sendNotification('arkitekt/check', {textDocument: {uri: document.uri.toString()}});
+    }),
+    vscode.commands.registerCommand('arkitekt.chooseApp', async () => {
+      if (client?.state !== State.Running) return vscode.commands.executeCommand('arkitekt.check');
+      return chooseApp(
+        {request: async <T>(method: string, params: object) => client?.sendRequest<T>(method, params) as Promise<T>},
+        () => vscode.commands.executeCommand('arkitekt.check'),
+      );
     }),
     vscode.commands.registerCommand('arkitekt.restart', async () => {
       if (client) {

@@ -8,7 +8,9 @@ Bloks in VS Code. It has two layers:
   The server runs in the app's environment, so install it there (`uv add --dev arkitekt-lsp`).
   The extension finds it in the workspace's `.venv`, next to the Python extension's interpreter,
   or on PATH, or at `arkitekt.lsp.path`. It starts only in a trusted workspace, because it
-  imports your app.
+  imports your app. With several apps in a folder, each file that declares one is checked as
+  itself; click the app in the status bar, or run `Arkitekt: Choose App…`, to pick the one the
+  other files belong to.
 - **The language, from the Orkestrator's core.** BSX is highlighted inside Python strings (any
   string that opens with a blok root: `<Html>`, `<Scene>`, `<Overlay>`, `<AgentLogo>`,
   `<ActionLogo>`) and in `.bsx` files. Completion, hovers and signature help come from the same
