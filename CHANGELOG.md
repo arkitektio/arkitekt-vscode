@@ -1,3 +1,11 @@
+# [1.1.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.0.0...v1.1.0) (2026-10-30)
+
+
+### Features
+
+* add a dependency by browsing the agents ([a205a1e](https://github.com/arkitektio/arkitekt-vscode/commit/a205a1e7ba578bb498f22a3deea818800fe9fb82))
+* log in from the status bar ([b6250ad](https://github.com/arkitektio/arkitekt-vscode/commit/b6250ad2d6290242ea24d7fd53f44babae7ba765))
+
 # 1.0.0 (2026-10-30)
 
 
