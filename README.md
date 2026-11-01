@@ -15,6 +15,10 @@ Bloks in VS Code. It has two layers:
   string that opens with a blok root: `<Html>`, `<Scene>`, `<Overlay>`, `<AgentLogo>`,
   `<ActionLogo>`) and in `.bsx` files. Completion, hovers and signature help come from the same
   code the Orkestrator's BlokEditor runs. Inside Python they need the server to find the bloks.
+- **A preview of each blok.** The lens above a blok, or `Arkitekt: Preview Blok`, draws it in a
+  panel beside the editor, and it follows your typing. It calls nothing: declared dependencies show
+  as not bound, and unless `arkitekt.server.actions` is on it reaches no server either. Only components the `ui`, `html`, `logo`,
+  `shadcn`, `scene` and `structure` catalogs define can be drawn.
 
 - **Who would satisfy your dependencies, once connected.** Local until you ask: use the button in
   the status bar, or run `Arkitekt: Connect to Server`, with your account on the server at
@@ -23,12 +27,17 @@ Bloks in VS Code. It has two layers:
   and the agents on hover. `Arkitekt: Add a Dependency from
   the Server…` (or the lens above your `App(...)`) lets you search the agents, tick the actions and
   states you need, and writes the `@app.declare` class for you.
+- **Your actions, with `arkitekt.server.actions`.** A lens above each action opens its form beside
+  the code, with the same widgets the Orkestrator draws, pickers included. Run starts it on the
+  server's agents and shows its events and returns. The app has to be running somewhere
+  (`arkitekt run dev`), or the lens says so. A blok's declared reads and pickers in the preview use
+  the server too, but subscriptions do not run in the editor.
 
 ## Develop
 
 ```bash
 pnpm install
-pnpm build        # generates the injection grammars, then bundles dist/extension.js
+pnpm build        # generates the injection grammars, then bundles dist/extension.js and the preview page
 pnpm typecheck
 ```
 

@@ -1,0 +1,93 @@
+/* Compiled by the Tailwind CLI into dist/webview.css. The classes a blok brings are compiled in the
+   page (`runtimeTailwind`); these are the classes of the renderer's own components and of main.tsx. */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+/* The path, not the package name: the package exports no stylesheet. */
+@import '../../node_modules/@arkitektio/bsx/dist/tailwind/theme.css';
+
+/* shadcn's variants, which the renderer's components use. An app with the `shadcn` package imports
+   `shadcn/tailwind.css` for these; this is that file's list, without the CLI it comes with. */
+@custom-variant data-open (&:where([data-state="open"]), &:where([data-open]:not([data-open="false"])));
+@custom-variant data-closed (&:where([data-state="closed"]), &:where([data-closed]:not([data-closed="false"])));
+@custom-variant data-checked (&:where([data-state="checked"]), &:where([data-checked]:not([data-checked="false"])));
+@custom-variant data-unchecked (&:where([data-state="unchecked"]), &:where([data-unchecked]:not([data-unchecked="false"])));
+@custom-variant data-selected (&:where([data-selected="true"]));
+@custom-variant data-disabled (&:where([data-disabled="true"]), &:where([data-disabled]:not([data-disabled="false"])));
+@custom-variant data-active (&:where([data-state="active"]), &:where([data-active]:not([data-active="false"])));
+@custom-variant data-horizontal (&:where([data-orientation="horizontal"]));
+@custom-variant data-vertical (&:where([data-orientation="vertical"]));
+
+@source '../../node_modules/@arkitektio/bsx/dist';
+@source './main.tsx';
+
+@theme inline {
+  --font-sans: var(--vscode-font-family);
+}
+
+/* The renderer's tokens, read from the editor's theme so a preview sits in it. The fallbacks are
+   for colours a theme may leave out. */
+:root {
+  --brand-hue: 267.256;
+  --brand-chroma: 0.20962;
+  --radius: 0.5rem;
+
+  --background: var(--vscode-editor-background);
+  --foreground: var(--vscode-editor-foreground);
+  --card: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+  --card-foreground: var(--vscode-editorWidget-foreground, var(--vscode-editor-foreground));
+  --popover: var(--vscode-menu-background, var(--vscode-editorWidget-background, var(--vscode-editor-background)));
+  --popover-foreground: var(--vscode-menu-foreground, var(--vscode-editor-foreground));
+  --primary: var(--vscode-button-background);
+  --primary-foreground: var(--vscode-button-foreground);
+  --secondary: var(--vscode-button-secondaryBackground, var(--vscode-editorWidget-background));
+  --secondary-foreground: var(--vscode-button-secondaryForeground, var(--vscode-editor-foreground));
+  --muted: color-mix(in srgb, var(--vscode-editor-foreground) 8%, var(--vscode-editor-background));
+  --muted-foreground: var(--vscode-descriptionForeground);
+  --accent: var(--vscode-list-hoverBackground, color-mix(in srgb, var(--vscode-editor-foreground) 12%, var(--vscode-editor-background)));
+  --accent-foreground: var(--vscode-list-hoverForeground, var(--vscode-editor-foreground));
+  --destructive: var(--vscode-errorForeground);
+  --border: var(--vscode-panel-border, color-mix(in srgb, var(--vscode-editor-foreground) 18%, transparent));
+  --input: var(--vscode-input-border, color-mix(in srgb, var(--vscode-editor-foreground) 25%, transparent));
+  --ring: var(--vscode-focusBorder);
+
+  --success: var(--vscode-testing-iconPassed, oklch(0.6 0.15 150));
+  --success-foreground: var(--vscode-editor-background);
+  --success-soft: color-mix(in srgb, var(--success) 18%, transparent);
+  --warning: var(--vscode-editorWarning-foreground, oklch(0.75 0.15 75));
+  --warning-foreground: var(--vscode-editor-background);
+  --warning-soft: color-mix(in srgb, var(--warning) 18%, transparent);
+  --info: var(--vscode-editorInfo-foreground, oklch(0.6 0.15 240));
+  --info-foreground: var(--vscode-editor-background);
+  --info-soft: color-mix(in srgb, var(--info) 18%, transparent);
+
+  --chart-1: oklch(0.65 0.2 265);
+  --chart-2: oklch(0.7 0.15 180);
+  --chart-3: oklch(0.75 0.15 75);
+  --chart-4: oklch(0.65 0.2 330);
+  --chart-5: oklch(0.65 0.2 30);
+
+  --spectrum-violet: oklch(0.6 0.2 295);
+  --spectrum-blue: oklch(0.6 0.2 255);
+  --spectrum-cyan: oklch(0.7 0.13 210);
+  --spectrum-green: oklch(0.65 0.17 150);
+  --spectrum-yellow: oklch(0.8 0.16 95);
+  --spectrum-orange: oklch(0.7 0.17 55);
+  --spectrum-red: oklch(0.6 0.22 27);
+  --spectrum-violet-soft: color-mix(in srgb, var(--spectrum-violet) 18%, transparent);
+  --spectrum-blue-soft: color-mix(in srgb, var(--spectrum-blue) 18%, transparent);
+  --spectrum-cyan-soft: color-mix(in srgb, var(--spectrum-cyan) 18%, transparent);
+  --spectrum-green-soft: color-mix(in srgb, var(--spectrum-green) 18%, transparent);
+  --spectrum-yellow-soft: color-mix(in srgb, var(--spectrum-yellow) 18%, transparent);
+  --spectrum-orange-soft: color-mix(in srgb, var(--spectrum-orange) 18%, transparent);
+  --spectrum-red-soft: color-mix(in srgb, var(--spectrum-red) 18%, transparent);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  /* VS Code gives a webview's body a padding of its own. */
+  body {
+    @apply bg-background p-0 font-sans text-foreground;
+  }
+}

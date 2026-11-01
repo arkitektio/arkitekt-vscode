@@ -51,6 +51,10 @@ export const serverSettings = (folder: vscode.WorkspaceFolder | undefined): Reco
     target: config.get<string>('target', '') || null,
     clientShowsLogin: true,
     clientPicksDependencies: true,
-    server: {connect: config.get<boolean>('server.connect', false), url: config.get<string>('server.url', '')},
+    server: {
+      connect: config.get<boolean>('server.connect', false),
+      url: config.get<string>('server.url', ''),
+      actions: config.get<boolean>('server.actions', false),
+    },
   };
 };

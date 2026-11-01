@@ -4,6 +4,9 @@ import {registerBsx, type Region} from './bsx';
 import {addDependency} from './dependency';
 import {chooseApp} from './apps';
 import {RekuestLogin, type Challenge, type RekuestStatus} from './login';
+import {ActionPanel} from './actions';
+import {registerPreview, type AskServer} from './preview';
+import type {TaskUpdate} from './webview/protocol';
 import {findServer, serverSettings} from './server';
 
 type WireRegion = Omit<Region, 'start' | 'end'> & {
@@ -14,6 +17,16 @@ type WireRegion = Omit<Region, 'start' | 'end'> & {
 type Status = {state: 'checking' | 'ok' | 'failed'; app: string; errors?: number; warnings?: number; message?: string | null};
 
 let client: LanguageClient | undefined;
+
+const askServer: AskServer = async <T>(method: string, params: object) => {
+  if (client?.state !== State.Running) throw new Error('arkitekt-lsp is not running.');
+  return client.sendRequest<T>(method, params);
+};
+
+let actionPanel: ActionPanel | undefined;
+
+/** The server came up or finished a check: the blok literals, and what is known of them, may differ. */
+const regionsChanged = new vscode.EventEmitter<void>();
 
 const regionCache = new Map<string, {version: number; regions: readonly Region[]}>();
 
@@ -65,13 +78,21 @@ const start = async (context: vscode.ExtensionContext, output: vscode.OutputChan
   };
   client = new LanguageClient('arkitekt', 'Arkitekt', serverOptions, clientOptions);
   context.subscriptions.push(
-    client.onNotification('arkitekt/status', (status: Status) => showStatus(item, status)),
+    client.onNotification('arkitekt/status', (status: Status) => {
+      showStatus(item, status);
+      if (status.state !== 'checking') {
+        regionCache.clear();
+        regionsChanged.fire();
+      }
+    }),
     client.onNotification('arkitekt/rekuest', (status: RekuestStatus) => login.onStatus(status)),
+    client.onNotification('arkitekt/task', (update: Omit<TaskUpdate, 'type'>) => actionPanel?.onTask(update)),
     client.onNotification('arkitekt/rekuest/challenge', (challenge: Challenge) => login.onChallenge(challenge)),
   );
   output.appendLine(`Starting ${command}`);
   login.reset();
   await client.start();
+  regionsChanged.fire();
 };
 
 export const activate = async (context: vscode.ExtensionContext): Promise<void> => {
@@ -95,8 +116,17 @@ export const activate = async (context: vscode.ExtensionContext): Promise<void> 
   context.subscriptions.push(output, item, rekuest);
 
   registerBsx(context, regionsOf);
+  const preview = registerPreview(context, regionsOf, regionsChanged.event, askServer);
+  actionPanel = new ActionPanel(context.extensionUri, askServer);
 
   context.subscriptions.push(
+    regionsChanged,
+    regionsChanged.event(() => preview.refresh()),
+    actionPanel,
+    vscode.commands.registerCommand('arkitekt.runAction', (action?: {hash: string; name?: string}) => {
+      if (action) return actionPanel?.open(action.hash, action.name ?? action.hash);
+      void vscode.window.showInformationMessage('Use the Run lens above an action. It shows with arkitekt.server.actions on, once connected.');
+    }),
     vscode.commands.registerCommand('arkitekt.check', async () => {
       const document = vscode.window.activeTextEditor?.document;
       if (!client || client.state !== State.Running) {

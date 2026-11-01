@@ -2,9 +2,11 @@
 #   esbuild           - postinstall resolves the platform binary
 #   @vscode/vsce-sign - marketplace signing, which neither packaging nor `vsce publish --oidc` needs
 #   keytar            - vsce's credential store, only for `vsce publish` with a stored token
+#   @parcel/watcher   - the Tailwind CLI's --watch; its prebuilt binary needs no script
 allowBuilds:
   esbuild: true
   '@vscode/vsce-sign': false
   keytar: false
+  '@parcel/watcher': false
 minimumReleaseAgeExclude:
-  - '@arkitektio/bsx@2.2.0'
+  - '@arkitektio/bsx@2.3.0'
