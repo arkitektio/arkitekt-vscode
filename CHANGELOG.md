@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.3.0...v1.4.0) (2026-11-01)
+
+
+### Features
+
+* a preview of each blok and a form for each action, beside the code ([3f12478](https://github.com/arkitektio/arkitekt-vscode/commit/3f12478642be4b6e7980427b666a3515d0ddfa66))
+
 # [1.3.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.2.0...v1.3.0) (2026-10-30)
 
 

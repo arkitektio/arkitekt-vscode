@@ -2,7 +2,7 @@
   "name": "arkitekt",
   "displayName": "Arkitekt",
   "description": "Arkitekt in VS Code: your app's own `arkitekt check` underlined in the BSX of every blok (through arkitekt-lsp), plus highlighting, completion and hovers for BSX, and a preview of each blok beside the editor.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "publisher": "arkitekt-dev",
   "icon": "images/icon.png",
   "license": "MIT",
