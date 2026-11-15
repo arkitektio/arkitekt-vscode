@@ -1,6 +1,7 @@
 import {existsSync} from 'node:fs';
 import {delimiter, dirname, isAbsolute, join} from 'node:path';
 import * as vscode from 'vscode';
+import {configuredCatalogs} from './catalogs';
 
 const EXECUTABLE = process.platform === 'win32' ? 'arkitekt-lsp.exe' : 'arkitekt-lsp';
 const BIN = process.platform === 'win32' ? 'Scripts' : 'bin';
@@ -49,6 +50,7 @@ export const serverSettings = (folder: vscode.WorkspaceFolder | undefined): Reco
       warnOnFStrings: config.get<boolean>('check.warnOnFStrings', true),
     },
     target: config.get<string>('target', '') || null,
+    catalogs: configuredCatalogs(folder),
     clientShowsLogin: true,
     clientPicksDependencies: true,
     server: {

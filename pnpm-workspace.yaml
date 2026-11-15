@@ -9,4 +9,4 @@ allowBuilds:
   keytar: false
   '@parcel/watcher': false
 minimumReleaseAgeExclude:
-  - '@arkitektio/bsx@2.3.0'
+  - '@arkitektio/bsx@2.3.0 || 5.0.0'

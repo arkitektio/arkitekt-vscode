@@ -12,13 +12,22 @@ Bloks in VS Code. It has two layers:
   itself; click the app in the status bar, or run `Arkitekt: Choose App…`, to pick the one the
   other files belong to.
 - **The language, from the Orkestrator's core.** BSX is highlighted inside Python strings (any
-  string that opens with a blok root: `<Html>`, `<Scene>`, `<Overlay>`, `<AgentLogo>`,
+  string that opens with a blok root: `<Html>`, `<Scene>`, `<Space>`, `<AgentLogo>`,
   `<ActionLogo>`) and in `.bsx` files. Completion, hovers and signature help come from the same
   code the Orkestrator's BlokEditor runs. Inside Python they need the server to find the bloks.
 - **A preview of each blok.** The lens above a blok, or `Arkitekt: Preview Blok`, draws it in a
   panel beside the editor, and it follows your typing. It calls nothing: declared dependencies show
-  as not bound, and unless `arkitekt.server.actions` is on it reaches no server either. Only components the `ui`, `html`, `logo`,
-  `shadcn`, `scene` and `structure` catalogs define can be drawn.
+  as not bound, and unless `arkitekt.server.actions` is on it reaches no server either. It draws
+  the base catalog: a component only another catalog has shows as one it cannot draw.
+- **The catalog a blok is written for.** A blok is written for the base catalog, which every
+  renderer draws, unless it names another (`app.blok(..., catalog=...)`). The base catalog and the
+  Orkestrator's ship with the extension. Any other is published at an address: list it under
+  `arkitekt.catalogs` and each check holds the bloks written for it to it, and completion, hovers
+  and the checks as you type know its components. A catalog a blok names is also loaded when you
+  first edit that blok. `arkitekt.catalog` names the one a `.bsx` file is written for, and
+  `Arkitekt: Reload Catalogs` pulls them again. The extension pulls nothing itself: `arkitekt-lsp`
+  does, over https only, capped in size and time, keeping what it pulled for when you are offline.
+  A catalog is read as data (names, props, descriptions); nothing in it is run.
 
 - **Who would satisfy your dependencies, once connected.** Local until you ask: use the button in
   the status bar, or run `Arkitekt: Connect to Server`, with your account on the server at

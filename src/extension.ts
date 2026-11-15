@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import {LanguageClient, State, type LanguageClientOptions, type ServerOptions} from 'vscode-languageclient/node';
 import {registerBsx, type Region} from './bsx';
+import {Catalogs} from './catalogs';
 import {addDependency} from './dependency';
 import {chooseApp} from './apps';
 import {RekuestLogin, type Challenge, type RekuestStatus} from './login';
@@ -24,6 +25,8 @@ const askServer: AskServer = async <T>(method: string, params: object) => {
 };
 
 let actionPanel: ActionPanel | undefined;
+
+let catalogs: Catalogs | undefined;
 
 /** The server came up or finished a check: the blok literals, and what is known of them, may differ. */
 const regionsChanged = new vscode.EventEmitter<void>();
@@ -93,6 +96,9 @@ const start = async (context: vscode.ExtensionContext, output: vscode.OutputChan
   login.reset();
   await client.start();
   regionsChanged.fire();
+  // The server pulls for us: what the workspace names is loaded as soon as it answers.
+  catalogs?.retry();
+  void catalogs?.loadConfigured();
 };
 
 export const activate = async (context: vscode.ExtensionContext): Promise<void> => {
@@ -115,13 +121,34 @@ export const activate = async (context: vscode.ExtensionContext): Promise<void> 
   );
   context.subscriptions.push(output, item, rekuest);
 
-  registerBsx(context, regionsOf);
+  const loaded = new Catalogs(askServer, output);
+  catalogs = loaded;
+  registerBsx(context, regionsOf, loaded);
   const preview = registerPreview(context, regionsOf, regionsChanged.event, askServer);
   actionPanel = new ActionPanel(context.extensionUri, askServer);
 
   context.subscriptions.push(
     regionsChanged,
     regionsChanged.event(() => preview.refresh()),
+    loaded,
+    vscode.workspace.onDidChangeConfiguration(event => {
+      // The server is told by its own synchronization; here the new ones are loaded for completion.
+      if (event.affectsConfiguration('arkitekt.catalogs')) void loaded.loadConfigured();
+    }),
+    vscode.commands.registerCommand('arkitekt.reloadCatalogs', async () => {
+      if (!running()) {
+        void vscode.window.showInformationMessage("arkitekt-lsp is not running: it is what pulls a catalog. It needs a trusted workspace and arkitekt-lsp in the app's environment.");
+        return;
+      }
+      const result = await loaded.loadConfigured({refresh: true});
+      if (result.loaded.length === 0 && result.failed.length === 0) {
+        void vscode.window.showInformationMessage('No catalog is named. Add the address a catalog is published at to the setting arkitekt.catalogs.');
+      } else if (result.failed.length > 0) {
+        void vscode.window.showWarningMessage(`${result.failed.length} of ${result.loaded.length + result.failed.length} catalogs could not be loaded: ${result.failed.map(([catalog, why]) => `${catalog} (${why})`).join('; ')}`);
+      } else {
+        void vscode.window.showInformationMessage(`Loaded ${result.loaded.length} ${result.loaded.length === 1 ? 'catalog' : 'catalogs'}.`);
+      }
+    }),
     actionPanel,
     vscode.commands.registerCommand('arkitekt.runAction', (action?: {hash: string; name?: string}) => {
       if (action) return actionPanel?.open(action.hash, action.name ?? action.hash);

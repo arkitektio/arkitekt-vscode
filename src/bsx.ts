@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {
   analyzeBsx,
   blokContextOf,
+  blokViewFor,
   completeBsx,
   emptyBlokScope,
   hoverBsx,
@@ -10,6 +11,7 @@ import {
   type BsxCompletionKind,
   type BsxEnvironment,
 } from './core';
+import {fileCatalog, isAddress, type Catalogs} from './catalogs';
 
 /** A blok literal of a Python document, as arkitekt-lsp's `bsx/regions` answers it. */
 export type Region = {
@@ -23,8 +25,11 @@ export type Region = {
   exact: boolean;
   /** The blok a check saw here (`panel`, `crop:html`), if one has. */
   blok?: string;
-  /** What that check said the blok declares: what `deps.*`, `args.*` and its locals complete against. */
-  scope?: BlokCheckScope;
+  /**
+   * What that check said the blok declares: what `deps.*`, `args.*` and its locals complete
+   * against. `catalog` is the one it is written for, as the check report names it.
+   */
+  scope?: BlokCheckScope & {catalog?: string | null};
 };
 
 /** The blok literals of a Python document; none when there is no server to ask. */
@@ -53,20 +58,32 @@ const TRIGGERS = ['<', ' ', '"', "'", '{', '.', '(', ',', '/', ':', '['];
  */
 const SCOPE_FREE = new Set(['bsx', 'expr', 'callback', 'palette', 'props', 'foreach', 'context', 'logo', 'catalog', 'toast']);
 
-const kindOf = (context: string): BlokCheckScope['kind'] =>
-  (context === 'ACTION_LOGO' ? 'action_logo' : context === 'OVERLAY' ? 'action' : 'agent') as BlokCheckScope['kind'];
+/** A blok opening with `<Space>` is an action's (it places the run's dependencies); a logo names its own kind. */
+const kindOf = (context: string, root?: string): BlokCheckScope['kind'] =>
+  (context === 'ACTION_LOGO' ? 'action_logo' : root === 'Space' ? 'action' : 'agent') as BlokCheckScope['kind'];
 
-/** A `.bsx` file's environment: its root names the context; nothing else is declared. */
-const fileEnvironment = (text: string): BsxEnvironment => {
-  const root = /<([A-Za-z_]\w*)/.exec(text)?.[1];
-  const context = (root && blokContextOf(root)) || 'HTML';
-  return {scope: emptyBlokScope(kindOf(context), context)};
+/**
+ * What a blok written for `catalog` completes and is checked against: that catalog, once it is
+ * known here (it ships, or was loaded), else the base catalog. One that is being loaded is the
+ * base catalog's until it has arrived.
+ */
+const environment = (scope: BlokCheckScope, catalog: string | null | undefined, catalogs: Catalogs): BsxEnvironment => {
+  if (catalog && isAddress(catalog) && !catalogs.known(catalog)) void catalogs.load(catalog);
+  const target = catalog && catalogs.known(catalog) ? catalog : null;
+  return {scope: {...scope, target}, view: blokViewFor(target)};
 };
 
-const locate = async (document: vscode.TextDocument, position: vscode.Position, regions: RegionSource): Promise<Located | null> => {
+/** A `.bsx` file's environment: its root names the context; its catalog is the `arkitekt.catalog` setting. */
+const fileEnvironment = (text: string, catalogs: Catalogs): BsxEnvironment => {
+  const root = /<([A-Za-z_]\w*)/.exec(text)?.[1];
+  const context = (root && blokContextOf(root)) || 'HTML';
+  return environment(emptyBlokScope(kindOf(context, root), context), fileCatalog(), catalogs);
+};
+
+const locate = async (document: vscode.TextDocument, position: vscode.Position, regions: RegionSource, catalogs: Catalogs): Promise<Located | null> => {
   if (document.languageId === 'bsx') {
     const value = document.getText();
-    return {value, offset: document.offsetAt(position), base: 0, env: fileEnvironment(value)};
+    return {value, offset: document.offsetAt(position), base: 0, env: fileEnvironment(value, catalogs)};
   }
   const offset = document.offsetAt(position);
   for (const region of await regions(document)) {
@@ -77,7 +94,7 @@ const locate = async (document: vscode.TextDocument, position: vscode.Position, 
         value: region.value,
         offset: offset - base,
         base,
-        env: {scope: region.scope ?? emptyBlokScope(region.kind as BlokCheckScope['kind'], region.context)},
+        env: environment(region.scope ?? emptyBlokScope(region.kind as BlokCheckScope['kind'], region.context), region.scope?.catalog, catalogs),
       };
     }
   }
@@ -85,7 +102,7 @@ const locate = async (document: vscode.TextDocument, position: vscode.Position, 
 };
 
 /** Completion, hovers and signature help in `.bsx` files and in the bloks of Python files. */
-export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSource): void => {
+export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSource, catalogs: Catalogs): void => {
   const selector: vscode.DocumentSelector = [
     {language: 'bsx'},
     {language: 'python', scheme: 'file'},
@@ -96,7 +113,7 @@ export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSou
       selector,
       {
         provideCompletionItems: async (document, position) => {
-          const at = await locate(document, position, regions);
+          const at = await locate(document, position, regions, catalogs);
           if (!at) return undefined;
           return completeBsx(at.value, at.offset, at.env).map(item => {
             const completion = new vscode.CompletionItem(item.label, KINDS[item.kind]);
@@ -113,7 +130,7 @@ export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSou
     ),
     vscode.languages.registerHoverProvider(selector, {
       provideHover: async (document, position) => {
-        const at = await locate(document, position, regions);
+        const at = await locate(document, position, regions, catalogs);
         const hover = at && hoverBsx(at.value, at.offset, at.env);
         if (!at || !hover) return undefined;
         const range = new vscode.Range(document.positionAt(at.base + hover.range.start), document.positionAt(at.base + hover.range.end));
@@ -124,7 +141,7 @@ export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSou
       selector,
       {
         provideSignatureHelp: async (document, position) => {
-          const at = await locate(document, position, regions);
+          const at = await locate(document, position, regions, catalogs);
           const signature = at && signatureBsx(at.value, at.offset, at.env);
           if (!signature) return undefined;
           const information = new vscode.SignatureInformation(signature.label, signature.documentation);
@@ -148,7 +165,7 @@ export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSou
   const analyze = (document: vscode.TextDocument) => {
     if (document.languageId !== 'bsx') return;
     const text = document.getText();
-    const {tree, markers} = analyzeBsx(text, fileEnvironment(text));
+    const {tree, markers} = analyzeBsx(text, fileEnvironment(text, catalogs));
     // What the parser refuses is the text's own; of the checker's findings only the scope-free ones.
     const told = tree === null ? markers : markers.filter(marker => SCOPE_FREE.has((marker.code ?? '').split('.')[0]));
     diagnostics.set(
@@ -167,6 +184,11 @@ export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSou
     vscode.workspace.onDidOpenTextDocument(analyze),
     vscode.workspace.onDidChangeTextDocument(event => analyze(event.document)),
     vscode.workspace.onDidCloseTextDocument(document => diagnostics.delete(document.uri)),
+    // A catalog arrived, or another is named: what a `.bsx` file's text says may differ.
+    catalogs.onDidChange(() => vscode.workspace.textDocuments.forEach(analyze)),
+    vscode.workspace.onDidChangeConfiguration(event => {
+      if (event.affectsConfiguration('arkitekt.catalog')) vscode.workspace.textDocuments.forEach(analyze);
+    }),
   );
   vscode.workspace.textDocuments.forEach(analyze);
 };

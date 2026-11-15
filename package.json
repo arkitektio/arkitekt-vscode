@@ -84,6 +84,11 @@
         "category": "Arkitekt"
       },
       {
+        "command": "arkitekt.reloadCatalogs",
+        "title": "Reload Catalogs",
+        "category": "Arkitekt"
+      },
+      {
         "command": "arkitekt.restart",
         "title": "Restart Language Server",
         "category": "Arkitekt"
@@ -149,6 +154,22 @@
           "scope": "resource",
           "description": "The app to check when the saved file is not itself one, as `arkitekt check` takes it (`app`, `pkg.main:api`, `app.py`), and which App to use in a file with several (`many.py:api`). `Arkitekt: Choose App…` sets it. Empty: the CLI's default (ARKITEKT_APP, else `app`)."
         },
+        "arkitekt.catalogs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "default": [],
+          "scope": "resource",
+          "description": "The published catalogs the bloks of this workspace are written for, by the address each is published at (https://...). Each check pulls them, so a blok naming one (`app.blok(..., catalog=...)`) is held to it, and completion and hovers know its components. The base catalog and the Orkestrator's ship with the extension and need no entry. A catalog is pulled by arkitekt-lsp over https only and read as data: nothing in it is run."
+        },
+        "arkitekt.catalog": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "The catalog a `.bsx` file is written for, by its address. Empty: the base catalog, which every renderer draws. A blok in a Python file names its own (`catalog=`)."
+        },
         "arkitekt.server.connect": {
           "type": "boolean",
           "default": false,
@@ -182,7 +203,7 @@
     "watch:css": "tailwindcss -i src/webview/webview.css -o dist/webview.css --watch"
   },
   "devDependencies": {
-    "@arkitektio/bsx": "^2.3.0",
+    "@arkitektio/bsx": "^5.0.0",
     "@hookform/resolvers": "^5.2.2",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
