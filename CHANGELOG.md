@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.4.0...v1.5.0) (2026-11-15)
+
+
+### Features
+
+* bsx 5, and the catalog a blok is written for is loaded ([69757e4](https://github.com/arkitektio/arkitekt-vscode/commit/69757e40b775392c99f6800c22dc3f1974717a4b))
+
 # [1.4.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.3.0...v1.4.0) (2026-11-01)
 
 
