@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {createRoot} from 'react-dom/client';
 import {parseBsxPartial} from '@arkitektio/bsx/bsx/index';
-import {declaredQueries, demoModel, liveModel, parseBlokDeclarations} from '@arkitektio/bsx/renderer/declarations';
+import {demoModel, liveModel, treeQueries} from '@arkitektio/bsx/renderer/declarations';
 import type {BlokReadExecutor} from '@arkitektio/bsx/renderer/runtime/reads';
 import type {BlokComponentNode} from '@arkitektio/bsx/renderer/runtime/types';
 import {configureBlokPlatform, declareBlokUi} from '@arkitektio/bsx/runtime';
@@ -77,7 +77,8 @@ const keysOf = (entries: unknown): string[] =>
     return typeof key === 'string' ? [key] : [];
   });
 
-type Scope = {dependencies?: unknown; locals?: unknown; queries?: unknown; subscriptions?: unknown};
+/** Where the blok is mounted (`arkitekt check --json`): its dependencies, args, ... What it owns is in its tree. */
+type Scope = {dependencies?: unknown};
 
 class DrawingBoundary extends React.Component<{resetKey: unknown; children: React.ReactNode}, {error: Error | null}> {
   override state = {error: null as Error | null};
@@ -105,16 +106,9 @@ const Preview = ({message}: {message: ShowBlok}) => {
   const scope = message.scope as Scope | null;
 
   const roots = React.useMemo(() => (tree ? [tree] : []), [tree]);
-  const declarations = React.useMemo(
-    () => parseBlokDeclarations({componentTree: roots, locals: scope?.locals, queries: scope?.queries, subscriptions: scope?.subscriptions}),
-    [roots, scope],
-  );
   const live = message.live;
-  const model = React.useMemo(
-    () => (live ? liveModel(roots, declarations) : {data: demoModel(roots, declarations), statuses: undefined}),
-    [live, roots, declarations],
-  );
-  const queries = React.useMemo(() => (live ? declaredQueries(declarations) : []), [live, declarations]);
+  const model = React.useMemo(() => (live ? liveModel(roots) : {data: demoModel(roots, {}), statuses: undefined}), [live, roots]);
+  const queries = React.useMemo(() => (live ? treeQueries(roots) : []), [live, roots]);
   const unbound = React.useMemo(() => keysOf(scope?.dependencies), [scope]);
 
   return (

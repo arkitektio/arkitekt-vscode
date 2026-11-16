@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
 import {
   analyzeBsx,
-  blokContextOf,
   blokViewFor,
   completeBsx,
-  emptyBlokScope,
   hoverBsx,
   signatureBsx,
+  sourceCatalog,
   type BlokCheckScope,
   type BsxCompletionKind,
   type BsxEnvironment,
@@ -18,18 +17,17 @@ export type Region = {
   start: vscode.Position;
   end: vscode.Position;
   value: string;
-  root: string;
-  context: string;
-  kind: string;
   /** The value is the text as written (no escapes): positions map one to one. */
   exact: boolean;
   /** The blok a check saw here (`panel`, `crop:html`), if one has. */
   blok?: string;
   /**
-   * What that check said the blok declares: what `deps.*`, `args.*` and its locals complete
-   * against. `catalog` is the one it is written for, as the check report names it.
+   * Where that check saw the blok mounted (`arkitekt check --json`): the kinds the mount takes,
+   * its dependencies and args, what `deps.*` and `args.*` complete against. Absent: mounted
+   * nowhere. What the blok is (its kind and context) and owns (its locals, queries,
+   * subscriptions) is read off its own `<Blok>`.
    */
-  scope?: BlokCheckScope & {catalog?: string | null};
+  scope?: BlokCheckScope | null;
 };
 
 /** The blok literals of a Python document; none when there is no server to ask. */
@@ -53,32 +51,26 @@ const KINDS: Record<BsxCompletionKind, vscode.CompletionItemKind> = {
 const TRIGGERS = ['<', ' ', '"', "'", '{', '.', '(', ',', '/', ':', '['];
 
 /**
- * The diagnostic families an empty scope cannot get wrong (arkitekt_lsp.live.SCOPE_FREE): a `.bsx`
- * file has no app, so what it reads of one is not told.
+ * What a blok is completed and checked against: where it is mounted (`scope`; null: nowhere) and
+ * the catalog its `<Blok catalog>` names (else `fallback`, the `arkitekt.catalog` setting), once
+ * that is known here (it ships, or was loaded), else the base catalog. One that is being loaded is
+ * the base catalog's until it has arrived.
  */
-const SCOPE_FREE = new Set(['bsx', 'expr', 'callback', 'palette', 'props', 'foreach', 'context', 'logo', 'catalog', 'toast']);
-
-/** A blok opening with `<Space>` is an action's (it places the run's dependencies); a logo names its own kind. */
-const kindOf = (context: string, root?: string): BlokCheckScope['kind'] =>
-  (context === 'ACTION_LOGO' ? 'action_logo' : root === 'Space' ? 'action' : 'agent') as BlokCheckScope['kind'];
-
-/**
- * What a blok written for `catalog` completes and is checked against: that catalog, once it is
- * known here (it ships, or was loaded), else the base catalog. One that is being loaded is the
- * base catalog's until it has arrived.
- */
-const environment = (scope: BlokCheckScope, catalog: string | null | undefined, catalogs: Catalogs): BsxEnvironment => {
+const environment = (text: string, scope: BlokCheckScope | null, fallback: string | null, catalogs: Catalogs): BsxEnvironment => {
+  let named: string | null = null;
+  try {
+    named = sourceCatalog(text);
+  } catch {
+    // Markup that does not parse yet names nothing.
+  }
+  const catalog = named ?? fallback;
   if (catalog && isAddress(catalog) && !catalogs.known(catalog)) void catalogs.load(catalog);
   const target = catalog && catalogs.known(catalog) ? catalog : null;
-  return {scope: {...scope, target}, view: blokViewFor(target)};
+  return {scope, view: blokViewFor(target)};
 };
 
-/** A `.bsx` file's environment: its root names the context; its catalog is the `arkitekt.catalog` setting. */
-const fileEnvironment = (text: string, catalogs: Catalogs): BsxEnvironment => {
-  const root = /<([A-Za-z_]\w*)/.exec(text)?.[1];
-  const context = (root && blokContextOf(root)) || 'HTML';
-  return environment(emptyBlokScope(kindOf(context, root), context), fileCatalog(), catalogs);
-};
+/** A `.bsx` file's environment: mounted nowhere; its catalog the one its `<Blok>` names, else the `arkitekt.catalog` setting. */
+const fileEnvironment = (text: string, catalogs: Catalogs): BsxEnvironment => environment(text, null, fileCatalog(), catalogs);
 
 const locate = async (document: vscode.TextDocument, position: vscode.Position, regions: RegionSource, catalogs: Catalogs): Promise<Located | null> => {
   if (document.languageId === 'bsx') {
@@ -94,7 +86,7 @@ const locate = async (document: vscode.TextDocument, position: vscode.Position, 
         value: region.value,
         offset: offset - base,
         base,
-        env: environment(region.scope ?? emptyBlokScope(region.kind as BlokCheckScope['kind'], region.context), region.scope?.catalog, catalogs),
+        env: environment(region.value, region.scope ?? null, region.scope?.catalog ?? null, catalogs),
       };
     }
   }
@@ -160,17 +152,15 @@ export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSou
     ),
   );
 
-  // A `.bsx` file has no app to check it: what its text says about itself, as it is typed.
+  // A `.bsx` file has no app to check it: checked unmounted, what its text says about itself, as it is typed.
   const diagnostics = vscode.languages.createDiagnosticCollection('bsx');
   const analyze = (document: vscode.TextDocument) => {
     if (document.languageId !== 'bsx') return;
     const text = document.getText();
-    const {tree, markers} = analyzeBsx(text, fileEnvironment(text, catalogs));
-    // What the parser refuses is the text's own; of the checker's findings only the scope-free ones.
-    const told = tree === null ? markers : markers.filter(marker => SCOPE_FREE.has((marker.code ?? '').split('.')[0]));
+    const {markers} = analyzeBsx(text, fileEnvironment(text, catalogs));
     diagnostics.set(
       document.uri,
-      told.map(marker => {
+      markers.map(marker => {
           const range = new vscode.Range(document.positionAt(marker.range.start), document.positionAt(Math.max(marker.range.end, marker.range.start + 1)));
           const diagnostic = new vscode.Diagnostic(range, marker.message, marker.severity === 'error' ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning);
           diagnostic.code = marker.code;

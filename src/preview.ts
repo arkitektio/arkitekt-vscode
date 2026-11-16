@@ -139,7 +139,7 @@ export class BlokPreview implements vscode.Disposable {
     // Text that does not tokenize yet can hide every blok for a moment: keep what is drawn.
     if (!region) return undefined;
     target.line = region.start.line;
-    return {type: 'show', title: region.blok ?? `${name}:${region.root}`, source: region.value, scope: region.scope ?? null, live: actionsEnabled(document.uri)};
+    return {type: 'show', title: region.blok ?? `${name}:${region.start.line + 1}`, source: region.value, scope: region.scope ?? null, live: actionsEnabled(document.uri)};
   }
 
   private createPanel(): vscode.WebviewPanel {

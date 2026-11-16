@@ -4,7 +4,7 @@
   "injectionSelector": "L:string.quoted.multi.python - string.interpolated.python - meta.embedded.block.bsx, L:string.quoted.raw.multi.python - string.interpolated.python - meta.embedded.block.bsx",
   "patterns": [
     {
-      "begin": "(?=<(?:Html|Scene|Space|AgentLogo|ActionLogo)\\b)",
+      "begin": "(?=<(?:Blok)\\b)",
       "end": "(?=\"\"\"|''')",
       "contentName": "meta.embedded.block.bsx",
       "patterns": [

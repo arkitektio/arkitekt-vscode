@@ -171,8 +171,8 @@ importers:
         version: 9.0.1
     devDependencies:
       '@arkitektio/bsx':
-        specifier: ^5.0.0
-        version: 5.0.0(2af86894df7a809ebb2bfad22bf4944f)
+        specifier: ^6.0.0
+        version: 6.0.0(2af86894df7a809ebb2bfad22bf4944f)
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.9.2(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.2.7))(zod@4.6.7)
@@ -308,8 +308,8 @@ packages:
   '@actions/io@3.0.2':
     resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
 
-  '@arkitektio/bsx@5.0.0':
-    resolution: {integrity: sha512-3uomOLJQMRm2/RjuqdkHhPg9GmyzecpWIPixan1SmgEL9KlzLCBdZMa2fZwqOUYq6aecgq8H2juzPHLqDXZA5w==}
+  '@arkitektio/bsx@6.0.0':
+    resolution: {integrity: sha512-g5aAGXB1rRXZJmNRE+AEA+gDIu1Dw6EAuNUD2mb0gvbmZCI57jA+bDGBAZGYvgiFVLIAxicEzmHciCogyd4t7w==}
     peerDependencies:
       '@hookform/resolvers': ^5.2.2
       '@monaco-editor/react': ^4.7.0
@@ -4230,7 +4230,7 @@ snapshots:
 
   '@actions/io@3.0.2': {}
 
-  '@arkitektio/bsx@5.0.0(2af86894df7a809ebb2bfad22bf4944f)':
+  '@arkitektio/bsx@6.0.0(2af86894df7a809ebb2bfad22bf4944f)':
     dependencies:
       graphql: 16.14.2
       react: 19.2.7

@@ -168,7 +168,7 @@
           "type": "string",
           "default": "",
           "scope": "resource",
-          "description": "The catalog a `.bsx` file is written for, by its address. Empty: the base catalog, which every renderer draws. A blok in a Python file names its own (`catalog=`)."
+          "description": "The catalog a `.bsx` file is written for, by its address. Used for a `.bsx` file whose `<Blok>` names no catalog of its own (`<Blok catalog=...>`); empty: the base catalog, which every renderer draws."
         },
         "arkitekt.server.connect": {
           "type": "boolean",
@@ -203,7 +203,7 @@
     "watch:css": "tailwindcss -i src/webview/webview.css -o dist/webview.css --watch"
   },
   "devDependencies": {
-    "@arkitektio/bsx": "^5.0.0",
+    "@arkitektio/bsx": "^6.0.0",
     "@hookform/resolvers": "^5.2.2",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",

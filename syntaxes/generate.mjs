@@ -1,7 +1,7 @@
 // Writes the two injection grammars that colour BSX inside Python strings, from bsx.tmLanguage.json.
 //
-// A blok is a Python string whose text starts with a root that names its context (`<Html>`,
-// `<Scene>`, ..., vocabulary.json `blok_roots`), so an injection begins there and ends before the
+// A blok is a Python string whose text starts with its one root element, `<Blok kind context>`
+// (vocabulary.json `blok.component`), so an injection begins there and ends before the
 // string's closing quote. Every rule of the copy also ends at that quote: an author mid-way through
 // `<Card ` must not have the tag swallow the `"""` and colour the rest of the file as BSX.
 import {readFileSync, writeFileSync} from 'node:fs';
@@ -11,7 +11,7 @@ import {fileURLToPath} from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const bsx = JSON.parse(readFileSync(join(here, 'bsx.tmLanguage.json'), 'utf8'));
 const vocabulary = JSON.parse(readFileSync(join(here, '../node_modules/@arkitektio/bsx/src/spec/vocabulary.json'), 'utf8'));
-const roots = Object.keys(vocabulary.blok_roots.roots).join('|');
+const roots = vocabulary.blok.component;
 
 const variants = [
   {
