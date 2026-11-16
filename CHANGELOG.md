@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.5.0...v1.6.0) (2026-11-16)
+
+
+### Features
+
+* bsx 6, bloks are self-contained <Blok kind context> trees ([e93442b](https://github.com/arkitektio/arkitekt-vscode/commit/e93442bccf48f0a40f4b699095a3ac543550939c))
+
 # [1.5.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.4.0...v1.5.0) (2026-11-15)
 
 
