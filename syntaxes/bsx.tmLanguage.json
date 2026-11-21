@@ -149,7 +149,7 @@
           "name": "keyword.control.bsx"
         },
         {
-          "match": "\\b(self|deps|queries|subscriptions|args|task|event|viewer|then|error)\\b",
+          "match": "\\b(self|deps|agents|queries|subscriptions|args|task|event|viewer|then|error)\\b",
           "name": "variable.language.bsx"
         },
         {
