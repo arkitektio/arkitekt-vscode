@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.6.0...v1.7.0) (2026-11-21)
+
+
+### Features
+
+* highlight agents, the root a custom blok reads its bound agents from ([2681282](https://github.com/arkitektio/arkitekt-vscode/commit/2681282fbfebdf3ec520abada6caae7f87c111d5))
+
 # [1.6.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.5.0...v1.6.0) (2026-11-16)
 
 
