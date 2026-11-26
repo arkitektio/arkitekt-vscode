@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.7.0...v1.8.0) (2026-11-26)
+
+
+### Features
+
+* .bsx files go to arkitekt-lsp, which checks them against their app ([0fb53fb](https://github.com/arkitektio/arkitekt-vscode/commit/0fb53fb4135fa09c43222c3f8625b9d343239aeb))
+
 # [1.7.0](https://github.com/arkitektio/arkitekt-vscode/compare/v1.6.0...v1.7.0) (2026-11-21)
 
 
