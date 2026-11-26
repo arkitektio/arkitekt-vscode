@@ -12,7 +12,7 @@ import {
 } from './core';
 import {fileCatalog, isAddress, type Catalogs} from './catalogs';
 
-/** A blok literal of a Python document, as arkitekt-lsp's `bsx/regions` answers it. */
+/** A blok literal of a Python document (or a whole `.bsx` file), as arkitekt-lsp's `bsx/regions` answers it. */
 export type Region = {
   start: vscode.Position;
   end: vscode.Position;
@@ -75,7 +75,10 @@ const fileEnvironment = (text: string, catalogs: Catalogs): BsxEnvironment => en
 const locate = async (document: vscode.TextDocument, position: vscode.Position, regions: RegionSource, catalogs: Catalogs): Promise<Located | null> => {
   if (document.languageId === 'bsx') {
     const value = document.getText();
-    return {value, offset: document.offsetAt(position), base: 0, env: fileEnvironment(value, catalogs)};
+    // Read by an app (`app.blok(name, Path(...))`): the server says where it is mounted.
+    const scope = (await regions(document))[0]?.scope ?? null;
+    const env = scope ? environment(value, scope, scope.catalog ?? fileCatalog(), catalogs) : fileEnvironment(value, catalogs);
+    return {value, offset: document.offsetAt(position), base: 0, env};
   }
   const offset = document.offsetAt(position);
   for (const region of await regions(document)) {
@@ -94,7 +97,13 @@ const locate = async (document: vscode.TextDocument, position: vscode.Position, 
 };
 
 /** Completion, hovers and signature help in `.bsx` files and in the bloks of Python files. */
-export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSource, catalogs: Catalogs): void => {
+export const registerBsx = (
+  context: vscode.ExtensionContext,
+  regions: RegionSource,
+  catalogs: Catalogs,
+  serving: () => boolean,
+  serverChanged: vscode.Event<void>,
+): void => {
   const selector: vscode.DocumentSelector = [
     {language: 'bsx'},
     {language: 'python', scheme: 'file'},
@@ -152,10 +161,14 @@ export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSou
     ),
   );
 
-  // A `.bsx` file has no app to check it: checked unmounted, what its text says about itself, as it is typed.
+  // A `.bsx` file an app reads is the server's to check, against that app; any other is checked here, unmounted.
   const diagnostics = vscode.languages.createDiagnosticCollection('bsx');
-  const analyze = (document: vscode.TextDocument) => {
+  const analyze = async (document: vscode.TextDocument) => {
     if (document.languageId !== 'bsx') return;
+    if (serving() && (await regions(document))[0]?.scope) {
+      diagnostics.delete(document.uri);
+      return;
+    }
     const text = document.getText();
     const {markers} = analyzeBsx(text, fileEnvironment(text, catalogs));
     diagnostics.set(
@@ -176,6 +189,7 @@ export const registerBsx = (context: vscode.ExtensionContext, regions: RegionSou
     vscode.workspace.onDidCloseTextDocument(document => diagnostics.delete(document.uri)),
     // A catalog arrived, or another is named: what a `.bsx` file's text says may differ.
     catalogs.onDidChange(() => vscode.workspace.textDocuments.forEach(analyze)),
+    serverChanged(() => vscode.workspace.textDocuments.forEach(analyze)),
     vscode.workspace.onDidChangeConfiguration(event => {
       if (event.affectsConfiguration('arkitekt.catalog')) vscode.workspace.textDocuments.forEach(analyze);
     }),

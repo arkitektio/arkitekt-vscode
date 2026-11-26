@@ -33,7 +33,7 @@ const regionsChanged = new vscode.EventEmitter<void>();
 
 const regionCache = new Map<string, {version: number; regions: readonly Region[]}>();
 
-/** The blok literals of a Python document, from arkitekt-lsp; none while it is not running. */
+/** The blok literals of a Python document (a `.bsx` file: one), from arkitekt-lsp; none while it is not running. */
 const regionsOf = async (document: vscode.TextDocument): Promise<readonly Region[]> => {
   const key = document.uri.toString();
   const cached = regionCache.get(key);
@@ -74,7 +74,10 @@ const start = async (context: vscode.ExtensionContext, output: vscode.OutputChan
   }
   const serverOptions: ServerOptions = {command, args: ['--stdio'], options: {cwd: folder?.uri.fsPath}};
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [{language: 'python', scheme: 'file'}],
+    documentSelector: [
+      {language: 'python', scheme: 'file'},
+      {language: 'bsx', scheme: 'file'},
+    ],
     initializationOptions: serverSettings(folder),
     synchronize: {configurationSection: 'arkitekt'},
     outputChannel: output,
@@ -123,7 +126,7 @@ export const activate = async (context: vscode.ExtensionContext): Promise<void> 
 
   const loaded = new Catalogs(askServer, output);
   catalogs = loaded;
-  registerBsx(context, regionsOf, loaded);
+  registerBsx(context, regionsOf, loaded, running, regionsChanged.event);
   const preview = registerPreview(context, regionsOf, regionsChanged.event, askServer);
   actionPanel = new ActionPanel(context.extensionUri, askServer);
 
